@@ -3,7 +3,6 @@ LABEL maintainer="Raimundo López"
 
 ENV PYTHONUNBUFFERED 1
 
-# Path: /app/requirements.txt
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
 COPY ./app /app
@@ -12,7 +11,7 @@ WORKDIR /app
 EXPOSE 8000
 
 ARG DEV=false
-# Path: /app
+
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     apk add --update --no-cache postgresql-client && \
