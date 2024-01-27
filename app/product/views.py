@@ -34,4 +34,5 @@ class ProductViewSet(ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def get_products(self, request):
+
         return Response({'data': self.serializer_class(self.queryset, many=True).data}, status=status.HTTP_200_OK)

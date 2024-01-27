@@ -77,15 +77,16 @@ class Product(models.Model):
   description = models.TextField()
   price = models.IntegerField(default=0)
   discount_percentage = models.IntegerField(default=0, null=True, blank=True)
-  image = models.ImageField(null=True, upload_to=product_image_file_path, blank=True)
+  image = models.ImageField(null=True, upload_to='products-images/', blank=True)
   category = models.TextField(choices=CATEGORY_OPTIONS, null=True)
   gender = models.TextField(choices=GENDER_OPTIONS, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 
+
   user = models.ForeignKey(
     User,
-    on_delete=models.CASCADE,
+    on_delete=models.SET_NULL,
     null=True,
     related_name='products'
   )

@@ -6,7 +6,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     user_name = serializers.SerializerMethodField()
 
-    def get_user(self, obj):
+    def get_user_name(self, obj):
         return obj.user.name
 
     class Meta:
