@@ -20,10 +20,7 @@ services:
       - DB_NAME=devdb
       - DB_USER=devdbuser
       - DB_PASS=changeme
-      - AWS_ACCESS_KEY_ID=AKIA22KQXHYZCAD5I6MI
-      - AWS_SECRET_KEY_ID=BFNUK+Npi0wc7LhxxuTg2kYzVfX1Mjk/GAJJjgFB
-      - AWS_STORAGE_BUCKET_NAME=ecommerce-back-images
-      - AWS_S3_REGION_NAME =sa-east-1
+
     depends_on:
       - db
 
