@@ -2,7 +2,7 @@
 Database models for the core app.
 """
 import uuid
-
+import os
 
 from django.db import models
 from django.contrib.auth.models import (
@@ -10,6 +10,13 @@ from django.contrib.auth.models import (
   BaseUserManager,
   PermissionsMixin
 )
+
+def product_image_file_path(instance, filename):
+  """Generate file path for new product image"""
+  ext = os.path.splitext(filename)[1]
+  filename = f'{uuid.uuid4()}.{ext}'
+
+  return os.path.join('uploads', 'products', filename )
 
 class UserManager(BaseUserManager):
   """Manager for user."""
@@ -45,3 +52,43 @@ class User(AbstractBaseUser, PermissionsMixin):
   objects = UserManager()
 
   USERNAME_FIELD = 'email'
+
+
+class Product(models.Model):
+  """Products in the system"""
+
+  CATEGORY_OPTIONS = (
+    ('Crop Tops', 'Crop Tops'),
+    ('Hoodies', 'Hoodies'),
+    ('Joggers', 'Joggers'),
+    ('Shorts', 'Shorts'),
+    ('Sports Bra', 'Sports Bra'),
+    ('Underwear', 'Underwear'),
+  )
+  GENDER_OPTIONS = (
+    ('Female', 'Female'),
+    ('Male', 'Male'),
+    ('Unisex', 'Unisex')
+  )
+
+
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  name = models.CharField(max_length=255)
+  description = models.TextField()
+  price = models.IntegerField(default=0)
+  discount_percentage = models.IntegerField(default=0, null=True, blank=True)
+  image = models.ImageField(null=True, upload_to=product_image_file_path, blank=True)
+  category = models.TextField(choices=CATEGORY_OPTIONS, null=True)
+  gender = models.TextField(choices=GENDER_OPTIONS, null=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+
+  user = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    null=True,
+    related_name='products'
+  )
+  def __str__(self):
+    return self.name
+

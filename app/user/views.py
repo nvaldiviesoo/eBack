@@ -41,6 +41,7 @@ class CustomLoginView(TokenObtainPairView):
             user_data = {
                 'username': user.name,
                 'email': user.email,
+                'is_superuser': user.is_superuser,
             }
             response = super().post(request, *args, **kwargs)
             response.data['user'] = user_data
