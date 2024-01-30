@@ -1,14 +1,14 @@
 """
-URL mapping for the user app
+URL mapping for the orders app
 """
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import UserModelViewSet
+from .views import OrderViewSet
 
 router = DefaultRouter()
-router.register(r'user', UserModelViewSet, basename='user')
+router.register(r'orders', OrderViewSet, basename='orders')
 
 urlpatterns = [
     path('', include(router.urls)),

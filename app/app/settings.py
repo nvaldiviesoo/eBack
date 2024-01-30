@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'core',
     'user',
     'product',
+    'order',
 ]
 
 REST_FRAMEWORK = {
@@ -53,6 +55,23 @@ REST_FRAMEWORK = {
     ),
 }
 
+SIMPLE_JWT = {
+  'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
+  'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+  'BLACKLIST_AFTER_ROTATION': True,
+  'AUTH_HEADER_TYPES': ('Bearer',),
+  'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = 'aed94ea792cedd'
+EMAIL_HOST_PASSWORD = 'ae8936ec05a14d'
+EMAIL_PORT = '2525'
+EMAIL_USE_TLS: False
+EMAIL_USE_SSL: False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

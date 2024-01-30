@@ -18,10 +18,14 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from user.views import CustomLoginView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/user/', include('user.urls')),
+    path('api/v1/user/login/', CustomLoginView.as_view(), name='custom_user_login'),
+    path('api/v1/', include('user.urls')),
     path('api/v1/', include('product.urls')),
+    path('api/v1/', include('order.urls')),
 ]
 
 if settings.DEBUG:
