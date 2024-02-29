@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAdminUser
 
 from core.models import Product, User
 
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ProductByIdSerializer
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -36,3 +36,13 @@ class ProductViewSet(ModelViewSet):
     def get_products(self, request):
 
         return Response({'data': self.serializer_class(self.queryset, many=True).data}, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def get_product_by_id(self, request):
+        product_id = request.query_params.get('id')
+        product = Product.objects.get(id=product_id)
+
+        serialized_product = ProductByIdSerializer(product)
+
+        return Response({'data': serialized_product.data}, status=status.HTTP_200_OK)
+

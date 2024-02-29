@@ -80,8 +80,8 @@ class Product(models.Model):
   image = models.ImageField(null=True, upload_to='products-images/', blank=True)
   category = models.TextField(choices=CATEGORY_OPTIONS, null=True)
   gender = models.TextField(choices=GENDER_OPTIONS, null=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now=True)
+
+  sizes = models.ManyToManyField('ProductSize', related_name='products')
 
 
   user = models.ForeignKey(
@@ -90,9 +90,22 @@ class Product(models.Model):
     null=True,
     related_name='products'
   )
+
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+
   def __str__(self):
     return self.name
 
+class ProductSize(models.Model):
+  """Product sizes in the system"""
+
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  name = models.CharField(max_length=255)
+  quantity = models.IntegerField(default=0)
+
+  def __str__(self):
+    return self.name
 
 class OrderStatus(models.TextChoices):
   PROCESSING = 'Processing'

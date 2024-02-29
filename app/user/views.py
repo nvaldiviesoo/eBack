@@ -37,7 +37,7 @@ class UserModelViewSet(ModelViewSet):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
       }
-      return Response({'data': serializer.data, 'token': token}, status=status.HTTP_201_CREATED)
+      return Response({'data': serializer.data, 'token': token, 'status':status.HTTP_201_CREATED   })
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
   @action(methods=['post'], detail=False)
@@ -50,7 +50,7 @@ class UserModelViewSet(ModelViewSet):
 
     send_forgot_password_email(user.email, token)
 
-    return Response({'message': f'Password reset email sent to {user.email}'}, status=status.HTTP_200_OK)
+    return Response({'message': f'Password reset email sent to {user.email}', 'status': status.HTTP_200_OK})
 
 class CustomLoginView(TokenObtainPairView):
 
@@ -67,6 +67,6 @@ class CustomLoginView(TokenObtainPairView):
             }
             response = super().post(request, *args, **kwargs)
             response.data['user'] = user_data
-            return Response({'data': response.data}, status=status.HTTP_200_OK)
+            return Response({'data': response.data, 'status': status.HTTP_200_OK})
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
