@@ -15,7 +15,6 @@ def product_image_file_path(instance, filename):
   """Generate file path for new product image"""
   ext = os.path.splitext(filename)[1]
   filename = f'{uuid.uuid4()}.{ext}'
-
   return os.path.join('uploads', 'products', filename )
 
 class UserManager(BaseUserManager):
@@ -70,6 +69,14 @@ class Product(models.Model):
     ('Male', 'Male'),
     ('Unisex', 'Unisex')
   )
+  SIZE_OPTIONS = (
+    ('XS', 'XS'),
+    ('S', 'S'),
+    ('M', 'M'),
+    ('L', 'L'),
+    ('XL', 'XL'),
+    ('XXL', 'XXL'),
+  )
 
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -80,9 +87,8 @@ class Product(models.Model):
   image = models.ImageField(null=True, upload_to='products-images/', blank=True)
   category = models.TextField(choices=CATEGORY_OPTIONS, null=True)
   gender = models.TextField(choices=GENDER_OPTIONS, null=True)
-
-  sizes = models.ManyToManyField('ProductSize', related_name='products')
-
+  size = models.TextField(choices=SIZE_OPTIONS, null=False, blank=False)
+  quantity = models.IntegerField(default=0, null=False, blank=False)
 
   user = models.ForeignKey(
     User,
@@ -93,16 +99,6 @@ class Product(models.Model):
 
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
-
-  def __str__(self):
-    return self.name
-
-class ProductSize(models.Model):
-  """Product sizes in the system"""
-
-  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  name = models.CharField(max_length=255)
-  quantity = models.IntegerField(default=0)
 
   def __str__(self):
     return self.name

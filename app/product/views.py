@@ -18,7 +18,7 @@ class ProductViewSet(ModelViewSet):
 
     """Only admin users actions"""
 
-    @action(methods=['post'], detail=False, permission_classes=[IsAdminUser])
+    @action(methods=['post'], detail=False)
     def add_product(self, request):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
