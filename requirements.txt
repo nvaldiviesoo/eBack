@@ -7,3 +7,4 @@ django-cors-headers==3.10.1
 django-storages>=1.11.1,<1.12
 boto3>=1.16.43,<1.17
 uwsgi>=2.0.19<=2.1
+python-dotenv=="1.0.0"
