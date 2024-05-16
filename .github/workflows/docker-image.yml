@@ -6,14 +6,22 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
+    - name: Create .env file
+      run: |
+        touch .env
+        echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+        echo DB_USER=${{ secrets.DB_USER }} >> .env
+        echo DB_PASS=${{ secrets.DB_PASS }} >> .env
+        echo DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} >> .env
+        echo DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }} >> .env
+        cat .env        
+      
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
     - name: Test  # Step 3: Run the tests
