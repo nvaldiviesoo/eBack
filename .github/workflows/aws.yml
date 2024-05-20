@@ -24,11 +24,13 @@ jobs:
               cd eBack &&
               sudo docker compose stop &&
               git checkout main &&
-              1862507J &&
+              echo fetch
               git fetch --all &&
-              1862507J &&
-              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 &&
+              echo reset
               git reset --hard origin/main &&
+              echo pull
               git pull origin main &&
-              sudo docker compose up -d              
+              echo docker
+              sudo docker compose up -d  
+              echo completo
               '
