@@ -26,8 +26,8 @@ jobs:
               git checkout main &&
               git fetch --all &&
               git reset --hard origin/main &&
-              git pull origin main &&
               1862507J &&
               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 &&
+              git pull origin main &&
               sudo docker compose up -d              
               '
