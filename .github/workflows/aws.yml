@@ -24,7 +24,9 @@ jobs:
               cd eBack &&
               sudo docker compose stop &&
               git checkout main &&
+              echo test &&
               git fetch --all &&
+              echo test2 &&
               git reset --hard origin/main &&
               1862507J &&
               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 &&
