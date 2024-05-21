@@ -23,7 +23,7 @@ jobs:
 
               # Now we have got the access of EC2 and we will start the deploy .
               cd eBack &&
-              sudo docker compose stop &&
+               sudo docker compose -f docker-compose-deploy.yml stop &&
               git checkout main &&
               echo fetch
               git fetch --all &&
@@ -32,6 +32,6 @@ jobs:
               echo pull
               git pull origin main &&
               echo docker
-              sudo docker compose up -d  
+              sudo docker compose -f docker-compose-deploy.yml up -d 
               echo completo
               '
