@@ -28,7 +28,6 @@ ALLOWED_HOSTS.extend(
     os.environ.get('ALLOWED_HOSTS', '').split(','),
   )
 )
-print(ALLOWED_HOSTS)
 
 
 # Application definition
