@@ -23,6 +23,6 @@ jobs:
         cat .env        
       
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s) && docker compose run app migrate
     - name: Test  # Step 3: Run the tests
       run: docker-compose run app python manage.py test
