@@ -51,6 +51,16 @@ class UserModelViewSet(ModelViewSet):
     send_forgot_password_email(user.email, token)
 
     return Response({'message': f'Password reset email sent to {user.email}', 'status': status.HTTP_200_OK})
+  
+  @action(methods=['get'], detail=False)
+  def me(self, request, *args, **kwargs):
+      user = request.user
+      if user.is_authenticated:
+          serializer = UserSerializer(user)
+          return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+      else:
+          return Response({'error': 'Not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+    
 
 class CustomLoginView(TokenObtainPairView):
 
