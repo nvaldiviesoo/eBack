@@ -43,8 +43,9 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
   """User in the system"""
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  email = models.EmailField(max_length=255, unique=True)
-  name = models.CharField(max_length=255)
+  email = models.EmailField(max_length=320, unique=True)
+  name = models.CharField(max_length=50)
+  balance = models.PositiveIntegerField(default=100000)
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
 
@@ -78,17 +79,33 @@ class Product(models.Model):
     ('XXL', 'XXL'),
   )
 
+  COLOR_OPTIONS = (
+    ('Red', 'Red'),
+    ('Yellow', 'Yellow'),
+    ('Blue', 'Blue'),
+    ('Black', 'Black'),
+    ('White', 'White'),
+    ('Green', 'Green'),
+    ('Orange', 'Orange'),
+    ('Purple', 'Purple'),
+    ('Pink', 'Pink'),
+    ('Brown', 'Brown'),
+    ('Grey', 'Grey'),
+    ('Beige', 'Beige'),
+    ('Other', 'Other')
+  )
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  name = models.CharField(max_length=255)
+  name = models.CharField(max_length=75)
   description = models.TextField()
-  price = models.IntegerField(default=0)
-  discount_percentage = models.IntegerField(default=0, null=True, blank=True)
+  price = models.PositiveIntegerField(default=0)
+  discount_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
   image = models.ImageField(null=True, upload_to='products-images/', blank=True)
   category = models.TextField(choices=CATEGORY_OPTIONS, null=True)
   gender = models.TextField(choices=GENDER_OPTIONS, null=True)
   size = models.TextField(choices=SIZE_OPTIONS, null=False, blank=False)
-  quantity = models.IntegerField(default=0, null=False, blank=False)
+  color = models.TextField(choices=COLOR_OPTIONS, null=False, blank=False, default='Other')
+  quantity = models.PositiveIntegerField(default=0, null=False, blank=False)
 
   user = models.ForeignKey(
     User,
@@ -122,22 +139,22 @@ class Order(models.Model):
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-  street_address = models.CharField(max_length=255, default='', blank=False)
-  city = models.CharField(max_length=255, default='', blank=False)
-  zip_code = models.CharField(max_length=255, default='' ,blank=False)
-  country = models.CharField(max_length=255, default='', blank=False)
-  total_amount = models.IntegerField(default=0)
+  street_address = models.CharField(max_length=50, default='', blank=False)
+  city = models.CharField(max_length=50, default='', blank=False)
+  zip_code = models.CharField(max_length=10, default='' ,blank=False)
+  country = models.CharField(max_length=20, default='', blank=False)
+  total_amount = models.PositiveIntegerField(default=0)
   payment_status = models.CharField(
-    max_length=255,
+    max_length=10,
     choices=PaymentStatus.choices,
     default=PaymentStatus.UNPAID
   )
-  status = models.CharField(max_length=255,
+  status = models.CharField(max_length=15,
     choices=OrderStatus.choices,
     default=OrderStatus.PROCESSING)
 
   payment_mode = models.CharField(
-    max_length=255,
+    max_length=10,
     choices=PaymentMode.choices,
     default=PaymentMode.COD
   )
@@ -161,9 +178,8 @@ class OrderItem(models.Model):
   """Order items in the system"""
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  name = models.CharField(max_length=255)
-  quantity = models.IntegerField(default=0)
-  price = models.IntegerField(default=0)
+  quantity = models.PositiveIntegerField(default=0)
+  price = models.PositiveIntegerField(default=0)
   product = models.ForeignKey(
     Product,
     on_delete=models.SET_NULL,
