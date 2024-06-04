@@ -54,8 +54,9 @@ class ProductViewSet(ModelViewSet):
         product = self.queryset.get(id=product_id)
         # A continuación, se debe recuperar el tamaño porque django no deja no actualizarlo a pesar de no ser nulo
         product_size = product.size
+        product_description = product.description
         request_data = request.data.copy() # request.data es inmutable
-        request_data.update({'size': product_size}) # se updatea size con el valor original
+        request_data.update({'size': product_size, 'description': product_description}) # se updatea size con el valor original
         
         # Flujo normal
         data_serializer = ProductSerializer(product, data=request_data)
