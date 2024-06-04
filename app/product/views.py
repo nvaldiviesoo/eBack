@@ -88,6 +88,9 @@ class ProductViewSet(ModelViewSet):
         product_id = request.data.get('id')
         product = self.queryset.get(id=product_id)
         new_stock = request.data.get('quantity')
+        if new_stock == None:
+            # OJO: Estandarizar este error 
+            return Response({'error': 'Quantity is required.'}, status=status.HTTP_400_BAD_REQUEST)
         data_serializer = ProductSerializer(product, data={'quantity': new_stock}, partial=True)
         if data_serializer.is_valid():
             data_serializer.save()

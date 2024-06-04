@@ -227,6 +227,19 @@ class Product_tests(TestCase): # Cambiar el nombre en caso de crear más clases.
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['data']['quantity'], 0)
+        
+    def test_stock_update_not_parameter(self):
+        self.assertEqual(self.product.quantity, 10)
+        data = json.dumps({
+            'id': str(self.product.id),
+            'price': 0
+        })
+        
+        url = '/api/v1/products/stock_update/'
+        response = self.apiclient.put(url, data, content_type='application/json')
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['error'], 'Quantity is required.')
     
     def test_stock_update_change_other_parameters(self):
         self.assertEqual(self.product.price, 1000)
