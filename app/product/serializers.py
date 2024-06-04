@@ -11,7 +11,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'user_name', 'user', 'created_at', 'updated_at', 'image']
+        fields = ['id', 'name', 'description', 'price', 'user_name',
+                  "discount_percentage" , 'user', 'created_at', 'updated_at',
+                  'image', 'category', "gender", "size", "color", "quantity"]
+        readl_only_fields = ['user_name', 'user', 'created_at', 'updated_at']
 
 
 class ProductByIdSerializer(serializers.ModelSerializer):
@@ -23,5 +26,5 @@ class ProductByIdSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = [ 'id', 'name', 'description', 'price', 'created_at', 'updated_at', 'image', 'user_name']
+        fields = "__all__"# Podría ser necesario agregar el resto, o poner "__all__" para mostrar todos los campos
         read_only_fields = ['user_name', 'user', 'created_at', 'updated_at']
