@@ -53,10 +53,25 @@ class ProductViewSet(ModelViewSet):
         product_id = request.data.get('id')
         product = self.queryset.get(id=product_id)
         # A continuación, se debe recuperar el tamaño porque django no deja no actualizarlo a pesar de no ser nulo
-        product_size = product.size
-        product_description = product.description
+        
+        # TODO: Cambiar a una función parte para que no esté en el controlador
+        if "size" not in request.data:
+            product_size = product.size
+        else:
+            product_size = request.data["size"]
+        
+        if "description" not in request.data:
+            product_description = product.description
+        else:
+            product_description = request.data["description"]
+            
+        if "name" not in request.data:
+            product_name = product.name
+        else: 
+            product_name = request.data["name"]
+            
         request_data = request.data.copy() # request.data es inmutable
-        request_data.update({'size': product_size, 'description': product_description}) # se updatea size con el valor original
+        request_data.update({'size': product_size, 'description': product_description, "name": product_name}) # se updatea size con el valor original
         
         # Flujo normal
         data_serializer = ProductSerializer(product, data=request_data)
