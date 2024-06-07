@@ -50,6 +50,13 @@ class ProductViewSet(ModelViewSet):
     # TODO: Falta implementar que solo haga put si es un admin
     def put(self, request, *args, **kwargs):
         """Handle updating an object"""
+        # TODO: Crear una función afuera de este archivo que valide si el usuario es staff
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': 'Not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+        if not user.is_staff:
+            return Response({'error': 'You are not an admin.'}, status=status.HTTP_403_FORBIDDEN)
+        
         product_id = request.data.get('id')
         product = self.queryset.get(id=product_id)
         # A continuación, se debe recuperar el tamaño porque django no deja no actualizarlo a pesar de no ser nulo
@@ -85,6 +92,13 @@ class ProductViewSet(ModelViewSet):
     @action(methods=['put'], detail=False)
     def stock_update(self, request, *args, **kwargs):
         """Handle updating ONLY stock of a product"""
+        
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': 'Not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+        if not user.is_staff:
+            return Response({'error': 'You are not an admin.'}, status=status.HTTP_403_FORBIDDEN)
+        
         product_id = request.data.get('id')
         product = self.queryset.get(id=product_id)
         new_stock = request.data.get('quantity')

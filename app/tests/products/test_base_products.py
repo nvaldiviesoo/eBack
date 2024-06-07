@@ -7,11 +7,12 @@ import json
 class Product_tests(TestCase): # Cambiar el nombre en caso de crear más clases.
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create(email='test@example.com', name='Test User')
+        self.user = User.objects.create(email='test@example.com', name='Test User', is_staff=True)
         self.product = Product.objects.create(name='Test Product',
                                               price=1000, quantity=10, description='Test Description', size='M', user=self.user, category='Shorts',
                                               )
         self.apiclient = APIClient()
+        self.apiclient.force_authenticate(user=self.user)
 
         
     def test_get_products_correctly(self):
@@ -272,5 +273,38 @@ class Product_tests(TestCase): # Cambiar el nombre en caso de crear más clases.
         self.assertEqual(self.product.category, 'Shorts')
         self.assertEqual(self.product.color, 'Other')
         
-
+class Product_tests_no_auth(TestCase): 
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create(email='test@example.com', name='Test User', is_staff=True)
+        self.product = Product.objects.create(name='Test Product',
+                                              price=1000, quantity=10, description='Test Description', size='M', user=self.user, category='Shorts',
+                                              )
+        self.apiclient = APIClient()
+    def test_stock_update_no_auth(self):
+        self.assertEqual(self.product.quantity, 10)
+        data = json.dumps({
+            'id': str(self.product.id),
+            'quantity': 5
+        }) 
+        url = '/api/v1/products/stock_update/'
         
+        response = self.apiclient.put(url, data, content_type='application/json')
+                    
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data['error'], 'Not authenticated')
+        self.assertEqual(self.product.quantity, 10)
+    
+    def test_product_put_no_auth(self):
+        self.assertEqual(self.product.quantity, 10)
+        data = json.dumps({
+            'id': str(self.product.id),
+            'quantity': 5
+        }) 
+        url = '/api/v1/products/'
+        
+        response = self.apiclient.put(url, data, content_type='application/json')
+                    
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data['error'], 'Not authenticated')
+        self.assertEqual(self.product.quantity, 10)
