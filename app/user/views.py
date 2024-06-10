@@ -25,6 +25,22 @@ class UserModelViewSet(ModelViewSet):
 
   queryset = User.objects.all()
   serializer_class = UserSerializer
+  
+  @action(methods=['delete'], detail=False)
+  def delete(self, request, *args, **kwargs):
+
+    active_user = request.user
+    if not active_user.is_authenticated:
+        return Response({'error': 'Not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+    if not active_user.is_staff:
+        return Response({'error': 'You are not an admin.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    user_id = request.data.get('id')
+    user = User.objects.get(id=user_id)
+    user.delete()
+    
+
+    return Response({'message': 'User deleted successfully', 'status': status.HTTP_204_NO_CONTENT})
 
   @action(methods=['post'], detail=False)
   def sign_up(self, request, *args, **kwargs):
