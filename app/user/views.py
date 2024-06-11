@@ -54,29 +54,51 @@ class UserModelViewSet(ModelViewSet):
   
   @action(methods=['get'], detail=False)
   def me(self, request, *args, **kwargs):
-      user = request.user
-      if user.is_authenticated:
-          serializer = UserSerializer(user)
-          return Response({'data': serializer.data}, status=status.HTTP_200_OK)
-      else:
-          return Response({'error': 'Not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+    user = request.user
+    if user.is_authenticated:
+      serializer = UserSerializer(user)
+      return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    else:
+      return Response({'error': 'Not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+  
+  @action(methods=['PUT'], detail=False)
+  def edit_profile(self, request, *args, **kwargs):
+    user = request.user
+    if not user.is_authenticated:
+      return Response({'error': 'Not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+    data = request.data
+    if 'name' not in data:
+      return Response({'error': 'Name field is required'}, status=status.HTTP_400_BAD_REQUEST)
+    if 'email' in data:
+      return Response({'error': 'Email field should not be included'}, status=status.HTTP_400_BAD_REQUEST)
+    if 'password' in data:
+      return Response({'error': 'Password field should not be included'}, status=status.HTTP_400_BAD_REQUEST)
+    if 'is_superuser' in data or 'balance' in data or 'is_staff' in data:
+      return Response({'error': 'You are not authorized to edit this field'}, status=status.HTTP_403_FORBIDDEN)
+    
+    user.name = data['name']
+    user.save()
+
+    serializer = UserSerializer(user)
+    return Response({'data': serializer.data})
+      
     
 
 class CustomLoginView(TokenObtainPairView):
 
   def post(self, request, *args, **kwargs):
-        username = request.data.get('email', None)
-        password = request.data.get('password', None)
+    username = request.data.get('email', None)
+    password = request.data.get('password', None)
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            user_data = {
-                'username': user.name,
-                'email': user.email,
-                'is_superuser': user.is_superuser,
-            }
-            response = super().post(request, *args, **kwargs)
-            response.data['user'] = user_data
-            return Response({'data': response.data, 'status': status.HTTP_200_OK})
-        else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+      user_data = {
+        'username': user.name,
+        'email': user.email,
+        'is_superuser': user.is_superuser,
+      }
+      response = super().post(request, *args, **kwargs)
+      response.data['user'] = user_data
+      return Response({'data': response.data, 'status': status.HTTP_200_OK})
+    else:
+      return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
