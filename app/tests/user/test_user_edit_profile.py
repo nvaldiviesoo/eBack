@@ -24,7 +24,8 @@ class TestUserEditProfile(TestCase):
     
     def test_edit_profile_email(self):
         data = json.dumps({
-            'email': 'testedit@example.com'
+            'email': 'testedit@example.com',
+            'name': 'Test User edit'
         })
 
         request = self.apiclient.put(self.url, data, content_type='application/json')
@@ -34,7 +35,8 @@ class TestUserEditProfile(TestCase):
     
     def test_edit_profile_password(self):
         data = json.dumps({
-            'password': '12345'
+            'password': '12345',
+            'name': 'Test User edit'
         })
 
         request = self.apiclient.put(self.url, data, content_type='application/json')
