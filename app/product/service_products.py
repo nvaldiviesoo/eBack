@@ -39,3 +39,9 @@ def create_stock_dict(products_array):
     for p in products_array:
         stock_dict[p.color][p.size] = p.quantity
     return stock_dict
+def create_image_dict(products_array):
+    '''Crea un diccionario para que el frontend pueda saber la imagen de cada color-talla de un producto (recordar que existen multiples instancias)'''
+    image_dict = {}
+    for p in products_array:
+        image_dict[p.color] =  {}
+    return image_dict
