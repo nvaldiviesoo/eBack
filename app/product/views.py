@@ -96,10 +96,12 @@ class ProductViewSet(ModelViewSet):
     @action(methods=['get'], detail=False)
     def get_product_by_id(self, request):
         product_id = request.query_params.get('id')
-        product = Product.objects.get(id=product_id)
-        serialized_product = ProductByIdSerializer(product)
-        return Response(serialized_product.data, status=status.HTTP_200_OK)
-    
+        try:
+            product = Product.objects.get(id=product_id)
+            serialized_product = ProductByIdSerializer(product)
+            return Response(serialized_product.data, status=status.HTTP_200_OK)
+        except:
+            return Response({"error": "Product not found"}, status=404)
         
 
     @action(methods=['get'], detail=False)
