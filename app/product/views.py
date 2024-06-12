@@ -32,15 +32,17 @@ class ProductViewSet(ModelViewSet):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            
-            #comprobar que no existe un prodcto con el mismo nombre y misma talla, color y tamaño (uno de los tres puede ser diferente)
-            if not self.queryset.filter(name=serializer.validated_data['name'], size=serializer.validated_data['size'], color=serializer.validated_data['color']).exists():
-                serializer.save(user=user)
-                return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
+        try:
+            if serializer.is_valid():
+                
+                #comprobar que no existe un prodcto con el mismo nombre y misma talla, color y tamaño (uno de los tres puede ser diferente)
+                if not self.queryset.filter(name=serializer.validated_data['name'], size=serializer.validated_data['size'], color=serializer.validated_data['color']).exists():
+                    serializer.save(user=user)
+                    return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
 
-            return Response({'data': {"error": "Ya existe este item"}}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'data': {"error": "Ya existe este item"}}, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
         """Handle updating an object"""
