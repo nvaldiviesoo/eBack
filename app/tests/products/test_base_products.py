@@ -3,6 +3,7 @@ from rest_framework.test import force_authenticate, APIClient
 from core.models import User, Product
 from product.views import ProductViewSet
 import json
+import uuid
 
 class Product_tests(TestCase): # Cambiar el nombre en caso de crear más clases.
     def setUp(self):
@@ -215,6 +216,19 @@ class Product_tests(TestCase): # Cambiar el nombre en caso de crear más clases.
         
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['quantity'][0], 'Ensure this value is greater than or equal to 0.')
+    
+    def test_stock_update_not_found(self):
+        self.assertEqual(self.product.quantity, 10)
+        data = json.dumps({
+            'id': str(uuid.uuid4()),
+            'quantity': 5
+        })
+        
+        url = '/api/v1/products/stock_update/'
+        response = self.apiclient.put(url, data, content_type='application/json')
+        
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data['error'], 'Product not found')
         
     def test_stock_update_to_0(self):
         self.assertEqual(self.product.quantity, 10)

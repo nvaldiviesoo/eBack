@@ -3,6 +3,7 @@ from rest_framework.test import force_authenticate, APIClient
 from core.models import User, Product
 from product.views import ProductViewSet
 import json
+import uuid
 
 class Product_show_by_name(TestCase): 
     def setUp(self):
@@ -22,6 +23,7 @@ class Product_show_by_name(TestCase):
                                               color='Blue')
         self.apiclient = APIClient()
         self.url = '/api/v1/products/get_product_by_name/'
+        self.url_id = '/api/v1/products/get_product_by_id/'
         self.apiclient.force_authenticate(user=self.user)
     
     def test_get_product_by_name(self):
@@ -49,6 +51,21 @@ class Product_show_by_name(TestCase):
             self.assertEqual(response.status_code, 404)
             self.assertEqual(response.data['error'], 'Product not found')
     
+    def test_get_product_by_id(self):
+        data = {'id': self.product1.id}
+        # response = self.apiclient.get(self.url_id + str(self.product1.id) )
+        response = self.apiclient.get(self.url_id, data )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], 'Test Product')
+    
+    def test_get_product_by_id_not_found(self):
+        data = {'id': uuid.uuid4()}
+        response = self.apiclient.get(self.url_id, data)
+        
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data['error'], 'Product not found')
+    
     def test_get_product_by_name_agregate_item(self):
         data = {'name': 'Test Product'}
         response = self.apiclient.get(self.url, data)
@@ -69,5 +86,3 @@ class Product_show_by_name(TestCase):
         self.assertEqual(response.data['data']['name'], 'Test Product')
         self.assertEqual(response.data["quantity"]["Red"], {"S": self.quantity_2, "M": self.quantity_1})
         self.assertEqual(response.data["quantity"]["Blue"], {"S": self.quantity_3, "XL": 1})
-        
-        
