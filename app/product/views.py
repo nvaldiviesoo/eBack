@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAdminUser
 from core.models import Product, User
 
 from .serializers import ProductSerializer, ProductByIdSerializer, ProductForShowSerializer
-from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict
+from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict, create_id_dict
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -116,6 +116,7 @@ class ProductViewSet(ModelViewSet):
         
         stock_dict = create_stock_dict(product)
         image_dict = create_image_dict(product)
+        id_dict = create_id_dict(product)
         serialized_product = ProductForShowSerializer(product[0]) # Utilizamos el primer producto, porque deberían ser todos iguales en teoría. Excepto por la imágen ahora que lo pienso.
 
-        return Response({"data" : serialized_product.data, "quantity": stock_dict, "color_photo": image_dict}, status=status.HTTP_200_OK)
+        return Response({"data" : serialized_product.data, "quantity": stock_dict, "ids": id_dict, "color_photo": image_dict}, status=status.HTTP_200_OK)

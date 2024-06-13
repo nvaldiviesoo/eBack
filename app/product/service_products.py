@@ -45,3 +45,11 @@ def create_image_dict(products_array):
     for p in products_array:
         image_dict[p.color] =  {}
     return image_dict
+def create_id_dict(products_array):
+    '''Crea un diccionario para que el frontend pueda saber la id de cada color-talla de un producto (recordar que existen multiples instancias)'''
+    id_dict = {}
+    for p in products_array:
+        id_dict[p.color] =  {}
+    for p in products_array:
+        id_dict[p.color][p.size] = p.id
+    return id_dict
