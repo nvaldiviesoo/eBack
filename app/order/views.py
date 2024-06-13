@@ -9,8 +9,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 
-from core.models import Order, OrderItem, Product
+from core.models import Order, OrderItem, Product, User
 from .serializers import OrderSerializer, OrderItemSerializer
+from .service_order import authenticate_staff
 
 class OrderViewSet(ModelViewSet):
 
@@ -53,4 +54,86 @@ class OrderViewSet(ModelViewSet):
 
             serializer = self.serializer_class(order, many=True)
             return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
-  
+        
+    @action(methods=['post'], detail=False)
+    def create_order_new(self, request):
+        # Validamos que exista un usuario haciendo la compra. Si no, no es necesario 
+        if not request.user.is_authenticated:
+            return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Revisar que existan los parametros necesarios antes de hacer la compra
+        street_address = request.data.get('street_address')
+        city = request.data.get('city')
+        zip_code = request.data.get('zip_code')
+        country = request.data.get('country')
+        payment_mode = request.data.get('payment_mode')
+        
+        if not street_address:
+            return Response({'error': 'Street address is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not city:
+            return Response({'error': 'City is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not zip_code:
+            return Response({'error': 'Zip code is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not country:
+            return Response({'error': 'Country is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not payment_mode:
+            return Response({'error': 'Payment mode is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Extraemos el carrito
+        cart = request.data.get('cart')
+        if cart is None:
+            return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+        if len(cart) == 0:
+            return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validamos que haya stock suficiente y mientras tanto, vamos sumando el precio.
+        total_amount = 0
+        for item in cart:
+            
+            product = Product.objects.get(id=item["id"])
+            if product is None:
+                return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+            if product.quantity < item['quantity']:
+                return Response({'error': 'Not enough stock'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            total_amount += item['quantity'] * (product.price * ((100 - product.discount_percentage) / 100))
+        
+        # Comprobamos el dinero del usuario sea mayor o igual al total de la compra
+        user = request.user
+        if user.balance < total_amount:
+            return Response({'error': 'Not enough balance'}, status=status.HTTP_400_BAD_REQUEST)
+        user.balance -= total_amount
+        user.save()
+        
+        # Creamos la orden
+        order = Order.objects.create(
+            user=user,
+            total_amount=total_amount,
+            payment_mode=payment_mode,
+            street_address=street_address,
+            city=city,
+            zip_code=zip_code,
+            country=country,    
+            payment_status='PAID'        
+        )
+        
+        # Creamos los items de la orden
+        for item in cart:
+            product = Product.objects.get(id=item["id"])
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=item['quantity'],
+                price=product.price * ((100 - product.discount_percentage) / 100),
+            )
+            product.quantity -= item['quantity']
+            product.save()
+        
+        # retornamos los orderitems serializados
+        
+        serializer = self.serializer_class(order)
+        
+        return Response({'data': serializer.data, "Balance": user.balance}, status=status.HTTP_201_CREATED)
+        
+        

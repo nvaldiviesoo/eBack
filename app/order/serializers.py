@@ -21,4 +21,4 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_order_items(self, obj):
         """Retrieve order items"""
         order_items = obj.order_items.all()
-        return OrderItemSerializer(order_items, many=True).dataw
+        return OrderItemSerializer(order_items, many=True).data
