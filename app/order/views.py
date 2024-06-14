@@ -40,8 +40,11 @@ class OrderViewSet(ModelViewSet):
             )
 
             for item in order_items:
-                product = Product.objects.get(id=item.get('product_id'))
-
+                try :
+                    product = Product.objects.get(id=item.get('product_id'))
+                except Product.DoesNotExist:
+                    return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+                
                 item = OrderItem.objects.create(
                     order=order,
                     name=product.name,
@@ -89,8 +92,11 @@ class OrderViewSet(ModelViewSet):
         # Validamos que haya stock suficiente y mientras tanto, vamos sumando el precio.
         total_amount = 0
         for item in cart:
+            try :
+                product = Product.objects.get(id=item["id"])
+            except Product.DoesNotExist:
+                return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
             
-            product = Product.objects.get(id=item["id"])
             if product is None:
                 return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
             
