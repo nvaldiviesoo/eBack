@@ -78,3 +78,13 @@ def create_id_dict(products_array):
     for p in products_array:
         id_dict[p.color][p.size] = p.id
     return id_dict
+
+def create_id_dict_for_color(products_array, product_initial):
+    '''Crea un diccionario para que el frontend pueda saber la id de cada color-talla de un producto (recordar que existen multiples instancias)'''
+    id_dict = {}
+    for p in Product.SIZE_OPTIONS:
+        id_dict[p[0]] = 0
+    for p in products_array:
+        if p.color == product_initial.color:
+            id_dict[p.size] = p.id
+    return id_dict

@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAdminUser
 from core.models import Product, User
 
 from .serializers import ProductSerializer, ProductByIdSerializer, ProductForShowSerializer
-from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict, create_id_dict, create_stock_dict_by_id, create_image_dict_with_id
+from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict, create_id_dict, create_stock_dict_by_id, create_image_dict_with_id, create_id_dict_for_color
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -162,7 +162,10 @@ class ProductViewSet(ModelViewSet):
         
         stock_dict = create_stock_dict_by_id(products, product)
         image_dict = create_image_dict_with_id(products)
-        id_dict = create_id_dict(products)
+        id_dict = create_id_dict_for_color(products, product)
         serialized_product = ProductSerializer(product)
 
-        return Response({"data" : serialized_product.data, "quantity": stock_dict, "ids": id_dict, "color_photo": image_dict}, status=status.HTTP_200_OK)
+        return Response({"data" : serialized_product.data,
+                         "quantity": stock_dict,
+                         "color_photo": image_dict,
+                         "ids": id_dict}, status=status.HTTP_200_OK)
