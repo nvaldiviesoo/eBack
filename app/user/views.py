@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 from core.models import User
 from core.utils.send_email import send_forgot_password_email
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserAdminViewSerializer
 
 
 class UserModelViewSet(ModelViewSet):
@@ -107,7 +107,7 @@ class UserModelViewSet(ModelViewSet):
       return Response({'error': 'You are not an admin.'}, status=status.HTTP_403_FORBIDDEN)
     
     users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
+    serializer = UserAdminViewSerializer(users, many=True)
     return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
       
     
