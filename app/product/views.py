@@ -88,6 +88,23 @@ class ProductViewSet(ModelViewSet):
         else:
             return Response(data_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({'data': data_serializer.data}, status=status.HTTP_200_OK)
+    
+    @action(methods=['delete'], detail=False)
+    def delete_product_by_id(self, request):
+        """Handle deleting a product"""
+        
+        user = request.user
+        auth = authenticate_staff(user)
+        if auth:
+            return Response(auth, status=status.HTTP_403_FORBIDDEN)
+        
+        product_id = request.query_params.get('id')
+        product = self.queryset.filter(id=product_id).first()
+        if not product:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        product.delete()
+        return Response({'data': 'Product deleted'}, status=status.HTTP_200_OK)
 
     """All users actions"""
 
