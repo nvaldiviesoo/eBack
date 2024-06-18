@@ -97,6 +97,18 @@ class UserModelViewSet(ModelViewSet):
 
     serializer = UserSerializer(user)
     return Response({'data': serializer.data})
+
+  @action(methods=['GET'], detail=False)
+  def all(self, request, *args, **kwargs):
+    active_user = request.user
+    if not active_user.is_authenticated:
+      return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    if not active_user.is_staff:
+      return Response({'error': 'You are not an admin.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
       
     
 
