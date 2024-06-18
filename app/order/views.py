@@ -18,6 +18,31 @@ class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
+    @action(methods=['get'], detail=False)
+    def get_orders(self, request):
+        user = request.user
+        if user.is_staff:
+            orders = Order.objects.all()
+        else:
+            return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.serializer_class(orders, many=True)
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    
+    @action(methods=['get'], detail=False)
+    def get_order_by_id(self, request):
+        user = request.user
+        if user.is_staff:
+            id = request.query_params.get('id')
+            try:
+                order = Order.objects.get(id=id)
+            except Order.DoesNotExist:
+                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.serializer_class(order)
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    
+    
     @action(methods=['post'], detail=False)
     def create_order(self, request):
         user = request.user
