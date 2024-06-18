@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 
-from core.models import Order, OrderItem, Product, User
+from core.models import Order, OrderItem, Product, User, OrderStatus
 from .serializers import OrderSerializer, OrderItemSerializer
 from .service_order import authenticate_staff
 
@@ -166,5 +166,29 @@ class OrderViewSet(ModelViewSet):
         serializer = self.serializer_class(order)
         
         return Response({'data': serializer.data, "Balance": user.balance}, status=status.HTTP_201_CREATED)
+    
+    
+    @action(methods=['patch'], detail=False)
+    def edit_order_status(self, request):
+        user = request.user
+        if  authenticate_staff(user):
+            return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
         
+        id = request.data.get('id')
+        # El nombre estatus es necesario porque "status" ya existe
+        estatus = request.data.get('status')
+        if estatus is None:
+            return Response({'error': 'Status is required'}, status=status.HTTP_400_BAD_REQUEST)
         
+        try:
+            order = Order.objects.get(id=id)
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if estatus not in OrderStatus.values:
+            return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        order.status = estatus
+        order.save()
+        serializer = self.serializer_class(order)
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
