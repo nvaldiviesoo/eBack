@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAdminUser
 from core.models import Product, User
 
 from .serializers import ProductSerializer, ProductByIdSerializer, ProductForShowSerializer
-from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict, create_id_dict
+from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict, create_id_dict, create_stock_dict_by_id, create_image_dict_with_id, create_id_dict_for_color
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -161,3 +161,28 @@ class ProductViewSet(ModelViewSet):
         serialized_product = ProductSerializer(product)
 
         return Response({"data" : serialized_product.data, "quantity": stock_dict, "ids": id_dict, "color_photo": image_dict}, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def get_product_by_id_specific_color(self, request):
+        try:
+            product_id = request.query_params.get('id')
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+        if product is None:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        products = Product.objects.filter(name=product.name)
+        if not products.exists():
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+        stock_dict = create_stock_dict_by_id(products, product)
+        image_dict = create_image_dict_with_id(products)
+        id_dict = create_id_dict_for_color(products, product)
+        serialized_product = ProductSerializer(product)
+
+        return Response({"data" : serialized_product.data,
+                         "quantity": stock_dict,
+                         "color_photo": image_dict,
+                         "ids": id_dict}, status=status.HTTP_200_OK)

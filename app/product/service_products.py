@@ -1,3 +1,5 @@
+from core.models import Product
+
 def authenticate_staff(user):
     '''Check if user is authenticated and is an admin.'''
     if not user.is_authenticated:
@@ -45,6 +47,29 @@ def create_image_dict(products_array):
     for p in products_array:
         image_dict[p.color] =  {}
     return image_dict
+
+def create_stock_dict_by_id(products_array, product_initial):
+    '''Crea un diccionario para que el frontend pueda saber el stock de cada talla de un producto-color (recordar que existen multiples instancias)'''
+    stock_dict = {}
+    for p in Product.SIZE_OPTIONS:
+        stock_dict[p[0]] = 0
+        
+    for p in products_array:
+        if p.color == product_initial.color:
+            stock_dict[p.size] = p.quantity
+    return stock_dict
+
+def create_image_dict_with_id(products_array):
+    '''Crea un diccionario para que el frontend pueda saber la imagen e id de cada color de un producto )'''
+    image_dict = {}
+    for p in products_array:
+        if p.image:
+            image_dict[p.color] =  {"id": p.id, "image": p.image.url}
+        else:
+            image_dict[p.color] =  {"id": p.id, "image": "Null"}
+    return image_dict
+
+
 def create_id_dict(products_array):
     '''Crea un diccionario para que el frontend pueda saber la id de cada color-talla de un producto (recordar que existen multiples instancias)'''
     id_dict = {}
@@ -52,4 +77,14 @@ def create_id_dict(products_array):
         id_dict[p.color] =  {}
     for p in products_array:
         id_dict[p.color][p.size] = p.id
+    return id_dict
+
+def create_id_dict_for_color(products_array, product_initial):
+    '''Crea un diccionario para que el frontend pueda saber la id de cada color-talla de un producto (recordar que existen multiples instancias)'''
+    id_dict = {}
+    for p in Product.SIZE_OPTIONS:
+        id_dict[p[0]] = 0
+    for p in products_array:
+        if p.color == product_initial.color:
+            id_dict[p.size] = p.id
     return id_dict
