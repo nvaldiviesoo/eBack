@@ -10,7 +10,7 @@ docker compose run --rm app sh -c 'python manage.py makemigrations'
 - Coverage
 
 ````
-docker-compose run app sh -c "coverage run manage.py test && coverage html"
+docker-compose run app sh -c "coverage run --source='.' manage.py test && coverage html"
 ````
 
 Eso genera el reporte en el contenedor

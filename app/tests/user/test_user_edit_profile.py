@@ -44,8 +44,15 @@ class TestUserEditProfile(TestCase):
     
     def test_edit_profile_unauthorized_params(self):
         data = json.dumps({
+            'name': 'Test User edit',
             'is_superuser': True
         })
+
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 403)
+    
+    def test_edit_profile_no_name(self):
+        data = json.dumps({})
 
         request = self.apiclient.put(self.url, data, content_type='application/json')
         self.assertEqual(request.status_code, 400)
@@ -58,4 +65,20 @@ class TestUserEditProfile(TestCase):
 
         request = self.apiclient.put(self.url, data, content_type='application/json')
         self.assertEqual(request.status_code, 403)
+    
+    def test_edit_profile_name_min_length(self):
+        data = json.dumps({
+            'name': 'Test'
+        })
+
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 400)
+    
+    def test_edit_profile_name_max_length(self):
+        data = json.dumps({
+            'name': 'qwertyuioplkjhgfdsazxcvbnmnbvcxzasdfghjkloiuytrewqwertyuioplkjhgfdsazxcvbnmnbvcxzasdfghjkloiuytrew'
+        })
+
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 400)
 

@@ -39,3 +39,52 @@ class AddProduct(TestCase):
         response = self.apiclient.post(self.url, data)
         
         self.assertEqual(response.status_code, 400)
+    
+    def test_add_product_invalid_category(self):
+        force_authenticate(self.staff)
+        data = {'name': 'Test Product 3', 'price': 1000, 'quantity': 10, 'description': 'Test Description', 'size': 'M', 'category': 'INVALID', 'color': 'Red'}
+        response = self.apiclient.post(self.url, data)
+
+        self.assertEqual(response.status_code, 400)
+    
+    def test_add_product_invalid_size(self):
+        force_authenticate(self.staff)
+        data = {'name': 'Test Product 3', 'price': 1000, 'quantity': 10, 'description': 'Test Description', 'size': 'INVALID', 'category': 'Shorts', 'color': 'Red'}
+        response = self.apiclient.post(self.url, data)
+
+        self.assertEqual(response.status_code, 400)
+    
+    def test_add_product_invalid_color(self):
+        force_authenticate(self.staff)
+        data = {'name': 'Test Product 3', 'price': 1000, 'quantity': 10, 'description': 'Test Description', 'size': 'M', 'category': 'Shorts', 'color': 'INVALID'}
+        response = self.apiclient.post(self.url, data)
+
+        self.assertEqual(response.status_code, 400)
+    
+    def test_add_product_invalid_price(self):
+        force_authenticate(self.staff)
+        data = {'name': 'Test Product 3', 'price': -1000, 'quantity': 10, 'description': 'Test Description', 'size': 'M', 'category': 'Shorts', 'color': 'Red'}
+        response = self.apiclient.post(self.url, data)
+
+        self.assertEqual(response.status_code, 400)
+    
+    def test_add_product_invalid_quantity(self):
+        force_authenticate(self.staff)
+        data = {'name': 'Test Product 3', 'price': 1000, 'quantity': -10, 'description': 'Test Description', 'size': 'M', 'category': 'Shorts', 'color': 'Red'}
+        response = self.apiclient.post(self.url, data)
+
+        self.assertEqual(response.status_code, 400)
+    
+    def test_add_product_invalid_gender(self):
+        force_authenticate(self.staff)
+        data = {'name': 'Test Product 3', 'price': 1000, 'quantity': 10, 'description': 'Test Description', 'size': 'M', 'category': 'Shorts', 'color': 'Red', 'gender': 'INVALID'}
+        response = self.apiclient.post(self.url, data)
+
+        self.assertEqual(response.status_code, 400)
+    
+    def test_add_product_invalid_name(self):
+        force_authenticate(self.staff)
+        data = {'name': 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd', 'price': 1000, 'quantity': 10, 'description': 'Test Description', 'size': 'M', 'category': 'Shorts', 'color': 'Red'}
+        response = self.apiclient.post(self.url, data)
+
+        self.assertEqual(response.status_code, 400)

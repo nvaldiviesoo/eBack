@@ -88,3 +88,45 @@ def create_id_dict_for_color(products_array, product_initial):
         if p.color == product_initial.color:
             id_dict[p.size] = p.id
     return id_dict
+
+def validate_quantity(quantity):
+    '''Valida que la cantidad sea válida'''
+    if int(quantity) < 0:
+        return False
+    return True
+
+def validate_price(price):
+    '''Valida que el precio sea válido'''
+    if int(price) < 0:
+        return False
+    return True
+
+def validate_category(category):
+    '''Valida que la categoría sea válida'''
+    if category not in [c[0] for c in Product.CATEGORY_OPTIONS]:
+        return False
+    return True
+
+def validate_size(size):
+    '''Valida que la talla sea válida'''
+    if size not in [s[0] for s in Product.SIZE_OPTIONS]:
+        return False
+    return True
+
+def validate_color(color):
+    '''Valida que el color sea válido'''
+    if color not in [c[0] for c in Product.COLOR_OPTIONS]:
+        return False
+    return True
+
+def validate_gender(gender):
+    '''Valida que el género sea válido'''
+    if gender not in [g[0] for g in Product.GENDER_OPTIONS]:
+        return False
+    return True
+
+def validate_name(name):
+    '''Valida que el nombre sea válido'''
+    if len(name) < 3 or len(name) > 75:
+        return False
+    return True

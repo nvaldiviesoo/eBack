@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAdminUser
 from core.models import Product, User
 
 from .serializers import ProductSerializer, ProductByIdSerializer, ProductForShowSerializer
-from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict, create_id_dict, create_stock_dict_by_id, create_image_dict_with_id, create_id_dict_for_color
+from .service_products import authenticate_staff, create_stock_dict, handle_put_request, create_image_dict, create_id_dict, create_stock_dict_by_id, create_image_dict_with_id, create_id_dict_for_color, validate_category, validate_color, validate_size, validate_gender, validate_name, validate_price, validate_quantity
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -28,6 +28,22 @@ class ProductViewSet(ModelViewSet):
         # auth = authenticate_staff(user)
         # if auth:
         #     return Response(auth, status=status.HTTP_403_FORBIDDEN)
+        if not validate_name(request.data.get('name')):
+            return Response({"error": "Invalid name"}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_price(request.data.get('price')):
+            return Response({"error": "Invalid price"}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_quantity(request.data.get('quantity')):
+            return Response({"error": "Invalid quantity"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not validate_category(request.data.get('category')) and request.data.get('category'):
+            return Response({"error": "Invalid category"}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_color(request.data.get('color')):
+            return Response({"error": "Invalid color"}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_size(request.data.get('size')):
+            return Response({"error": "Invalid size"}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_gender(request.data.get('gender')) and request.data.get('gender'):
+            return Response({"error": "Invalid gender"}, status=status.HTTP_400_BAD_REQUEST)
+        
         
         user_id = request.user.id
         user = User.objects.get(id=user_id)

@@ -59,3 +59,10 @@ class TestUserStaff(TestCase):
     def test_make_user_staff_no_data(self):
         request = self.apiclient.put(self.url + str(self.user.id), content_type='application/json')
         self.assertEqual(request.status_code, 400)
+    
+    def test_make_user_staff_no_id(self):
+        data = json.dumps({
+            'is_staff': True,
+        })
+        request = self.apiclient.put('/api/v1/user/staff/', data, content_type='application/json')
+        self.assertEqual(request.status_code, 400)
