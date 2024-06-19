@@ -91,6 +91,10 @@ class UserModelViewSet(ModelViewSet):
       return Response({'error': 'Password field should not be included'}, status=status.HTTP_400_BAD_REQUEST)
     if 'is_superuser' in data or 'balance' in data or 'is_staff' in data:
       return Response({'error': 'You are not authorized to edit this field'}, status=status.HTTP_403_FORBIDDEN)
+    if len(data['name']) <= 5: 
+      return Response({'error': 'Name field should not be less than 5 characters'}, status=status.HTTP_400_BAD_REQUEST)
+    if len(data['name']) > 50:
+      return Response({'error': 'Name field should not exceed 50 characters'}, status=status.HTTP_400_BAD_REQUEST)
     
     user.name = data['name']
     user.save()
