@@ -161,3 +161,26 @@ class ProductViewSet(ModelViewSet):
         serialized_product = ProductSerializer(product)
 
         return Response({"data" : serialized_product.data, "quantity": stock_dict, "ids": id_dict, "color_photo": image_dict}, status=status.HTTP_200_OK)
+    
+        
+    @action(methods=['get'], detail=False)
+    def filter_products(self, request):
+        """Handle filtering products by category"""
+            
+        category = request.query_params.get('category')
+        if not category:
+            return Response({'error': 'Category is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        products = Product.objects.filter(category=category)
+        if not products.exists():
+            return Response({'error': 'Products not found for this category'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Solo mandaremos uno de cada color y nombre, independiente de la tallas
+        products_dict = {}
+        # Podría  ser lento, tal vez sea mejor solo presentar uno por nombre y así es una sola quary
+        for product in products:
+            products_dict[product.name, product.color] = product
+        products = list(products_dict.values())
+
+        serialized_products = ProductForShowSerializer(products, many=True)
+        return Response({"data" : serialized_products.data}, status=status.HTTP_200_OK)
