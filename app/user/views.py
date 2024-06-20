@@ -138,6 +138,36 @@ class UserModelViewSet(ModelViewSet):
       return Response({'data': serializer.data})
     except User.DoesNotExist:
       return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+  
+  @action(methods=['patch'], detail=False) 
+  def edit_balance(self, request, *args, **kwargs):
+    user = request.user
+    if not user.is_authenticated:
+      return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    if not user.is_staff:
+      return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_403_FORBIDDEN)
+    if not 'id' in request.query_params:
+      return Response({'error': 'User id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    if not 'balance' in request.data:
+      return Response({'error': 'Balance field is required'}, status=status.HTTP_400_BAD_REQUEST)
+    user_id = request.query_params.get('id')
+    try:
+      user = User.objects.get(id=user_id)
+      add_balance = request.data.get('balance')
+      try:
+        add_balance = float(add_balance)
+      except ValueError:
+        return Response({'error': 'Balance should be a number'}, status=status.HTTP_400_BAD_REQUEST)
+      if add_balance < 0:
+        return Response({'error': 'Balance should not be negative'}, status=status.HTTP_400_BAD_REQUEST)
+      
+      user.balance += add_balance
+      user.save()
+
+      serializer = UserSerializer(user)
+      return Response({'data': serializer.data})
+    except User.DoesNotExist:
+      return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
       
     
 
