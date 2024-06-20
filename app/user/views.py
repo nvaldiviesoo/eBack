@@ -146,11 +146,13 @@ class UserModelViewSet(ModelViewSet):
       return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
     if not user.is_staff:
       return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_403_FORBIDDEN)
-    if not 'id' in request.query_params:
+    
+    if not 'id' in request.data.keys():
       return Response({'error': 'User id is required'}, status=status.HTTP_400_BAD_REQUEST)
-    if not 'balance' in request.data:
+    if not 'balance' in request.data.keys():
       return Response({'error': 'Balance field is required'}, status=status.HTTP_400_BAD_REQUEST)
-    user_id = request.query_params.get('id')
+    
+    user_id = request.data.get('id')
     try:
       user = User.objects.get(id=user_id)
       add_balance = request.data.get('balance')
