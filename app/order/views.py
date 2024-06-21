@@ -50,45 +50,6 @@ class OrderViewSet(ModelViewSet):
         return Response({'data': serializer.data, "products": product_order_dict}, status=status.HTTP_200_OK)
     
     
-    @action(methods=['post'], detail=False)
-    def create_order(self, request):
-        user = request.user
-        order_items = request.data.get('order_items')
-
-        if order_items and len(order_items) == 0:
-            return Response({'error': 'Order items cannot be empty'}, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-
-            total_amount = sum(item.get('price') * item.get('quantity') for item in order_items)
-
-            order = Order.objects.create(
-                user=user,
-                street_address=request.data.get('street_address'),
-                city=request.data.get('city'),
-                zip_code=request.data.get('zip_code'),
-                country=request.data.get('country'),
-                total_amount=total_amount,
-            )
-
-            for item in order_items:
-                try :
-                    product = Product.objects.get(id=item.get('product_id'))
-                except Product.DoesNotExist:
-                    return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
-                
-                item = OrderItem.objects.create(
-                    order=order,
-                    name=product.name,
-                    quantity=item.get('quantity'),
-                    price=item.get('price'),
-                )
-
-                product.stock -= item.quantity
-                product.save()
-
-            serializer = self.serializer_class(order, many=True)
-            return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
         
     @action(methods=['post'], detail=False)
     def create_order_new(self, request):
