@@ -66,3 +66,12 @@ class TestUserStaff(TestCase):
         })
         request = self.apiclient.put('/api/v1/user/staff/', data, content_type='application/json')
         self.assertEqual(request.status_code, 400)
+    
+    def test_make_user_staff_own_staff(self):
+        data = json.dumps({
+            'is_staff': False,
+        })
+        request = self.apiclient.put(self.url + str(self.staff_user.id), data, content_type='application/json')
+        self.assertEqual(request.status_code, 403)
+        self.staff_user.refresh_from_db()
+        self.assertTrue(self.staff_user.is_staff)
