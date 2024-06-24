@@ -128,6 +128,8 @@ class UserModelViewSet(ModelViewSet):
     if not 'is_staff' in request.data:
       return Response({'error': 'is_staff field is required'}, status=status.HTTP_400_BAD_REQUEST)
     user_id = request.query_params.get('id')
+    if str(user.id) == user_id:
+      return Response({'error': 'You cannot change your own staff status'}, status=status.HTTP_403_FORBIDDEN)
     try:
       user = User.objects.get(id=user_id)
       new_staff = request.data.get('is_staff') 
