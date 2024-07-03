@@ -92,6 +92,12 @@ class GetOrderTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(response.data['data']['id']), str(self.order_1.id))
+        self.assertEqual(len(response.data["products"]), 2)
+        self.assertEqual(response.data["products"][f"{self.product1.id}"]["name"], str(self.product1.name))
+        self.assertEqual(response.data["products"][f"{self.product2.id}"]["name"], str(self.product2.name))
+
+        
+
     
     def test_get_order_by_id_no_staff(self):
         self.client.force_authenticate(self.user_1)
