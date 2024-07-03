@@ -39,8 +39,15 @@ class OrderViewSet(ModelViewSet):
                 return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
+        
+        product_order_dict = {}
+        for order_item in order.order_items.all():
+            product = Product.objects.get(id=order_item.product_id)
+            product_order_dict[str(order_item.product_id)] = {"name": product.name ,"quantity": order_item.quantity, "price": order_item.price, "color": product.color, "size": product.size, "discount_percentage": product.discount_percentage, "stock": product.quantity}
+        
         serializer = self.serializer_class(order)
-        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+        
+        return Response({'data': serializer.data, "products": product_order_dict}, status=status.HTTP_200_OK)
     
     
         
