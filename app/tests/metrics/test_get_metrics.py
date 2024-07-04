@@ -90,3 +90,10 @@ class GetMetricsTestCase(TestCase):
         self.assertEqual(response.data['data']['highest_sold_product'], 'Test Product 1')
         self.assertEqual(response.data['data']['average_order_value'], 2500)
         self.assertEqual(list(response.data['data']['price_distribution']), [1000, 1000, 1000])
+    
+    def test_get_metrics_unauthorized(self):
+        self.client.force_authenticate(self.user_1)
+        url = '/api/v1/metrics/get_metrics/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data['error'], 'Not authorized')
