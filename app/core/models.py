@@ -46,6 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
   email = models.EmailField(max_length=320, unique=True)
   name = models.CharField(max_length=50)
   balance = models.PositiveIntegerField(default=100000)
+  birth_date = models.DateField(null=True, blank=True)
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
 
