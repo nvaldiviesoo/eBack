@@ -18,7 +18,7 @@ class MetricsViewSet(ModelViewSet):
             revenue = Order.objects.aggregate(total = Sum('total_amount'))['total']
             total_sold_products = Product.objects.aggregate(total = Sum('quantity_sold'))['total']
             highest_sold_product = Product.objects.order_by('-quantity_sold').first()
-            average_order_value = Order.objects.aggregate(total = Avg('total_amount'))['total']
+            average_order_value = int(Order.objects.aggregate(total = Avg('total_amount'))['total'])
             price_distribution = Product.objects.values_list('price', flat=True)
             data = {
                 'revenue': revenue,
