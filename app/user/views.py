@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+from datetime import datetime
 
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
@@ -95,12 +96,22 @@ class UserModelViewSet(ModelViewSet):
       return Response({'error': 'Name field should not be less than 5 characters'}, status=status.HTTP_400_BAD_REQUEST)
     if len(data['name']) > 50:
       return Response({'error': 'Name field should not exceed 50 characters'}, status=status.HTTP_400_BAD_REQUEST)
-    
+    if 'birth_date' in data:
+      if data['birth_date'] == '':
+        return Response({'error': 'Birth date should not be empty'}, status=status.HTTP_400_BAD_REQUEST)
+      elif type(data['birth_date']) != str:
+        return Response({'error': 'Invalid birth_date format, should be YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+      else:
+        try:
+          parsed_date = datetime.strptime(data['birth_date'], '%Y-%m-%d').date()
+          user.birth_date = parsed_date
+        except ValueError:
+          return Response({'error': 'Invalid birth_date format, should be YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
     user.name = data['name']
     user.save()
 
     serializer = UserSerializer(user)
-    return Response({'data': serializer.data})
+    return Response({'data': serializer.data}, status=status.HTTP_200_OK)
 
   @action(methods=['GET'], detail=False)
   def all(self, request, *args, **kwargs):

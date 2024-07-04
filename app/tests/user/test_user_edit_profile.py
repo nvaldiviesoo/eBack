@@ -81,4 +81,48 @@ class TestUserEditProfile(TestCase):
 
         request = self.apiclient.put(self.url, data, content_type='application/json')
         self.assertEqual(request.status_code, 400)
+    
+    def test_edit_profile_birth_date(self):
+        data = json.dumps({
+            'name': 'Test User edit',	
+            'birth_date': '2021-01-01'
+        })
 
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 200)
+
+    def test_edit_profile_birth_date_empty(self):
+        data = json.dumps({
+            'name': 'Test User edit',	
+            'birth_date': ''
+        })
+
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 400)
+
+    def test_edit_profile_birth_date_invalid_format(self):
+        data = json.dumps({
+            'name': 'Test User edit',	
+            'birth_date': '01-01-2021'
+        })
+
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 400)
+
+    def test_edit_profile_birth_date_invalid_date(self):
+        data = json.dumps({
+            'name': 'Test User edit',	
+            'birth_date': '2021-13-01'
+        })
+
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 400)
+
+    def test_edit_profile_birth_date_invalid_type(self):
+        data = json.dumps({
+            'name': 'Test User edit',	
+            'birth_date': 20210101
+        })
+
+        request = self.apiclient.put(self.url, data, content_type='application/json')
+        self.assertEqual(request.status_code, 400)
