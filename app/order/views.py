@@ -127,6 +127,7 @@ class OrderViewSet(ModelViewSet):
                 price=product.price * ((100 - product.discount_percentage) / 100),
             )
             product.quantity -= item['quantity']
+            product.quantity_sold += item['quantity']
             product.save()
         
         # retornamos los orderitems serializados

@@ -106,6 +106,7 @@ class Product(models.Model):
   size = models.TextField(choices=SIZE_OPTIONS, null=False, blank=False)
   color = models.TextField(choices=COLOR_OPTIONS, null=False, blank=False, default='Other')
   quantity = models.PositiveIntegerField(default=0, null=False, blank=False)
+  quantity_sold = models.PositiveIntegerField(default=0, null=False, blank=False)
 
   user = models.ForeignKey(
     User,
