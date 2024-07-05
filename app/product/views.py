@@ -60,6 +60,75 @@ class ProductViewSet(ModelViewSet):
         except:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=False)           
+    def add_multiple_products(self, request):
+        """Request multiple products """
+
+        user = request.user
+        auth = authenticate_staff(user)
+        if auth:
+            return Response(auth, status=status.HTTP_403_FORBIDDEN)
+
+        return_list = [] # Esta lista va a retornar los errores de cada producto que se crearan
+        for product in request.data.get("products"):
+            return_dict = {"name": None, "error": None}
+            if not validate_name(product.get('name')):
+                return_dict["error"] = "Invalid name"
+                return_list.append(return_dict)
+                continue
+            return_dict["name"] = product.get('name')
+
+            if not validate_price(product.get('price')):
+                return_dict["error"] = "Invalid price"
+                return_list.append(return_dict)
+                continue
+
+            if not validate_quantity(product.get('quantity')):
+                return_dict["error"] = "Invalid quantity"
+                return_list.append(return_dict)
+                continue
+
+            if not validate_category(product.get('category')) and product.get('category'):
+                return_dict["error"] = "Invalid category"
+                return_list.append(return_dict)
+                continue
+
+            if not validate_color(product.get('color')):
+                return_dict["error"] = "Invalid color"
+                return_list.append(return_dict)
+                continue
+
+            if not validate_size(product.get('size')):
+                return_dict["error"] = "Invalid size"
+                return_list.append(return_dict)
+                continue
+            if not validate_gender(product.get("gender")):
+                return_dict["error"] = "Invalid gender" # Dangerous move
+                return_list.append(return_dict)
+                continue
+
+            serializer = self.serializer_class(data=product)
+
+            try:
+                if serializer.is_valid():
+                    if not self.queryset.filter(name=serializer.validated_data['name'], size=serializer.validated_data['size'], color=serializer.validated_data['color']).exists():
+                        return_dict["error"] = "Producto creado sin errores"
+                        serializer.save(user=user)
+                    else: 
+                        return_dict["error"] = "Ya existe este item"
+                else:
+                    return_dict["error"] = serializer.errors
+            except:
+                return_dict["error"] = serializer.errors
+            return_list.append(return_dict)
+
+        for product in return_list:
+            if product["error"] == "Producto creado sin errores":
+                return Response({'data': return_list}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({'data': return_list}, status=status.HTTP_202_ACCEPTED)
+    
+
     def put(self, request, *args, **kwargs):
         """Handle updating an object"""
         user = request.user
