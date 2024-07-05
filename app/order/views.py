@@ -22,7 +22,7 @@ class OrderViewSet(ModelViewSet):
     def get_orders(self, request):
         user = request.user
         if user.is_staff:
-            orders = Order.objects.all()
+            orders = Order.objects.all().order_by('-created_at')
         else:
             return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
         serializer = self.serializer_class(orders, many=True)
