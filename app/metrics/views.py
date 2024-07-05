@@ -23,7 +23,11 @@ class MetricsViewSet(ModelViewSet):
             data = {
                 'revenue': revenue,
                 'total_sold_products': total_sold_products,
-                'highest_sold_product': highest_sold_product.name,
+                'highest_sold_product': {
+                    'name': highest_sold_product.name,
+                    'quantity_sold': highest_sold_product.quantity_sold,
+                    'image': highest_sold_product.image if highest_sold_product.image else ''
+                },
                 'average_order_value': average_order_value,
                 'price_distribution': price_distribution
             }
