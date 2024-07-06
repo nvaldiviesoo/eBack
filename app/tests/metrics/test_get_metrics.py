@@ -87,7 +87,7 @@ class GetMetricsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['data']['revenue'], 5000)
         self.assertEqual(response.data['data']['total_sold_products'], 5)
-        self.assertEqual(response.data['data']['highest_sold_product'], {'name': 'Test Product 1', 'quantity_sold': 3, 'image': ''})
+        self.assertEqual(response.data['data']['highest_sold_product'], {'name': 'Test Product 1', 'quantity_sold': 3, 'id': str(self.product1.id)})
         self.assertEqual(response.data['data']['average_order_value'], 2500)
         self.assertEqual(list(response.data['data']['price_distribution']), [1000, 1000, 1000])
     
