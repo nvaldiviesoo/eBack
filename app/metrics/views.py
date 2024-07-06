@@ -26,7 +26,7 @@ class MetricsViewSet(ModelViewSet):
                 'highest_sold_product': {
                     'name': highest_sold_product.name,
                     'quantity_sold': highest_sold_product.quantity_sold,
-                    'image': highest_sold_product.image if highest_sold_product.image else ''
+                    'id': str(highest_sold_product.id)
                 },
                 'average_order_value': average_order_value,
                 'price_distribution': price_distribution
