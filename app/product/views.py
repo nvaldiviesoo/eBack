@@ -191,6 +191,40 @@ class ProductViewSet(ModelViewSet):
         product.delete()
         return Response({'data': 'Product deleted'}, status=status.HTTP_200_OK)
 
+    @action(methods=['patch'], detail=False)
+    def edit_product_discount(self, request):
+        """Handle editing discount of a product"""
+        
+        user = request.user
+        auth = authenticate_staff(user)
+        if auth:
+            return Response(auth, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            product_id = request.data.get('id')
+            product = self.queryset.filter(id=product_id).first()
+        except:
+            return Response({'error': 'ID must be a valid ID.'}, status=status.HTTP_404_NOT_FOUND)
+        if not product:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+        new_discount = request.data.get('discount')
+        if new_discount == None:
+            return Response({'error': 'Discount is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if int(new_discount) < 0 or int(new_discount) > 100:
+                return Response({'error': 'Discount must be between 0 and 100.'}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response({'error': 'Discount must be an integer.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        products = Product.objects.filter(name=product.name, color=product.color).update(discount_percentage=new_discount)
+        products = Product.objects.filter(name=product.name, color=product.color) # Actualizamos la lista de productos
+
+        data_serializer = ProductSerializer(products, many=True)
+
+        return Response({'data': data_serializer.data}, status=status.HTTP_200_OK)
+
     """All users actions"""
 
     @action(methods=['get'], detail=False)
@@ -281,7 +315,7 @@ class ProductViewSet(ModelViewSet):
         if product is None:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        products = Product.objects.filter(name=product.name)
+        products = Product.objects.filter(name=product.name, color=product.color)
         if not products.exists():
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
         
