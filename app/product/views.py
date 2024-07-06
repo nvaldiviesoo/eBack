@@ -23,11 +23,10 @@ class ProductViewSet(ModelViewSet):
     def add_product(self, request):
         # """Handle creating a new product"""
         
-        # Por ahora el auth estará apagado para que sea más  fácil probar
-        # user = request.user
-        # auth = authenticate_staff(user)
-        # if auth:
-        #     return Response(auth, status=status.HTTP_403_FORBIDDEN)
+        user = request.user
+        auth = authenticate_staff(user)
+        if auth:
+            return Response(auth, status=status.HTTP_403_FORBIDDEN)
         if not validate_name(request.data.get('name')):
             return Response({"error": "Invalid name"}, status=status.HTTP_400_BAD_REQUEST)
         if not validate_price(request.data.get('price')):
