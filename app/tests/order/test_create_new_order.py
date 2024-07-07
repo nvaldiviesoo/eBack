@@ -21,6 +21,12 @@ class Create_new_order(TestCase):
         self.product3 = Product.objects.create(name='Test Product',
                                               price=1000, quantity=self.quantity1, description='S Blue product', size='S', user=self.user, category='Shorts',
                                               color='Blue')
+        self.product_discount = Product.objects.create(name='Test Product',
+                                              price=1000, quantity=self.quantity1, description='M Test product ', size='M', user=self.user, category='Shorts',
+                                              color='Red', discount_percentage=50)
+        self.product_discount_2 = Product.objects.create(name='Test Product',
+                                              price=1000, quantity=self.quantity1, description='M Test product ', size='M', user=self.user, category='Shorts',
+                                              color='Red', discount_percentage=90)
         self.apiclient = APIClient()
         self.url = '/api/v1/orders/create_order_new/'
         self.apiclient.force_authenticate(user=self.user)
@@ -433,5 +439,49 @@ class Create_new_order(TestCase):
             self.assertEqual(self.product2.quantity, self.quantity1 - 1)
             self.assertEqual(self.user.balance, 0)
                                               
-    
-    
+    def test_create_order_with_discount(self):
+        data = {
+            "street_address": self.street_address,
+            "city": self.city,
+            "zip_code": self.zip_code,
+            "country": self.country,
+            "payment_mode": self.payment_mode,
+            "cart": [
+            {
+                "id": str(self.product_discount.id),
+                "quantity": 1,
+            }
+        ]
+        }
+        
+        response = self.apiclient.post(self.url, json.dumps(data), content_type='application/json')
+        self.user.refresh_from_db()
+        
+        
+        # buscamos la orden creada
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['data']['total_amount'], 500)
+        self.assertEqual(self.user.balance, 1500)
+        
+        data = {
+            "street_address": self.street_address,
+            "city": self.city,
+            "zip_code": self.zip_code,
+            "country": self.country,
+            "payment_mode": self.payment_mode,
+            "cart": [
+            {
+                "id": str(self.product_discount.id),
+                "quantity": 1,
+            }, {
+                "id": str(self.product_discount_2.id),
+                "quantity": 2,
+            }
+        ]
+        }
+        response = self.apiclient.post(self.url, json.dumps(data), content_type='application/json')
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['data']['total_amount'], 700) # ambos productos valen 1000. el primero tiene 50% de descuento y el segundo tiene 90% de descuento
+        self.assertEqual(self.user.balance, 1500-700)
+        
