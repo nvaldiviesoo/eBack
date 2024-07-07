@@ -455,10 +455,13 @@ class Create_new_order(TestCase):
         }
         
         response = self.apiclient.post(self.url, json.dumps(data), content_type='application/json')
+        self.user.refresh_from_db()
+        
         
         # buscamos la orden creada
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['data']['total_amount'], 500)
+        self.assertEqual(self.user.balance, 1500)
         
         data = {
             "street_address": self.street_address,
@@ -477,5 +480,8 @@ class Create_new_order(TestCase):
         ]
         }
         response = self.apiclient.post(self.url, json.dumps(data), content_type='application/json')
+        self.user.refresh_from_db()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['data']['total_amount'], 700) # ambos productos valen 1000. el primero tiene 50% de descuento y el segundo tiene 90% de descuento
+        self.assertEqual(self.user.balance, 1500-700)
+        
